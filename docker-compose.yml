@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: treasury_ms
+      POSTGRES_USER: treasury
+      POSTGRES_PASSWORD: treasury_secret_2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U treasury"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: treasury
+      DB_PASSWORD: treasury_secret_2024
+      DB_NAME: treasury_ms
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRATION: 8h
+      PORT: 3001
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3001
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
