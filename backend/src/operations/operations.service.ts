@@ -22,6 +22,7 @@ export class OperationsService {
   }
 
   async create(data: Partial<Operation>): Promise<Operation> {
+    if (!data.type) throw new BadRequestException('Le type d\'opération est requis');
     const op = this.opRepo.create({
       ...data,
       reference: data.reference || this.generateRef(data.type),

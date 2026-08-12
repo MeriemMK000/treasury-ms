@@ -1,6 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../../common/base.entity';
 import { Currency } from '../../common/enums';
+import { BankingLine } from './banking-line.entity';
 
 @Entity('commitment_maturities')
 export class CommitmentMaturity extends BaseEntity {

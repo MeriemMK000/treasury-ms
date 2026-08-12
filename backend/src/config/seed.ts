@@ -1,11 +1,11 @@
 import { DataSource } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { v4 as uuid } from 'uuid';
 
 const ds = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT, 10) || 5432,
+  port: parseInt(process.env.DB_PORT || '5432', 10),
   username: process.env.DB_USERNAME || 'treasury',
   password: process.env.DB_PASSWORD || 'treasury_secret_2024',
   database: process.env.DB_NAME || 'treasury_ms',

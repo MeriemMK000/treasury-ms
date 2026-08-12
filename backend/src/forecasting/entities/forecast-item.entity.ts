@@ -1,6 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../../common/base.entity';
 import { Currency } from '../../common/enums';
+import { CashForecast } from './cash-forecast.entity';
 
 @Entity('forecast_items')
 export class ForecastItem extends BaseEntity {

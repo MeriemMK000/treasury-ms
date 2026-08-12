@@ -1,6 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../../common/base.entity';
 import { FeeType, Currency } from '../../common/enums';
+import { Operation } from './operation.entity';
 
 @Entity('bank_fees')
 export class BankFee extends BaseEntity {
