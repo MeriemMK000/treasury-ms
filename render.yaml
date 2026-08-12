@@ -6,10 +6,10 @@ databases:
 
 services:
   - type: web
-    name: treasury-ms
+    name: treasury-ms-api
     plan: free
     env: docker
-    dockerfilePath: ./Dockerfile.render
+    dockerfilePath: ./Dockerfile.backend
     envVars:
       - key: DB_HOST
         fromDatabase:
@@ -39,3 +39,20 @@ services:
         value: "8h"
       - key: NODE_ENV
         value: "production"
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: treasury-ms-web
+          envVarKey: RENDER_EXTERNAL_URL
+
+  - type: web
+    name: treasury-ms-web
+    plan: free
+    env: docker
+    dockerfilePath: ./Dockerfile.frontend
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: treasury-ms-api
+          envVarKey: RENDER_EXTERNAL_URL

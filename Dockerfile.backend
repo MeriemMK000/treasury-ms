@@ -1,0 +1,16 @@
+# ---- Build ----
+FROM node:20-alpine AS build
+WORKDIR /build
+COPY backend/package*.json ./
+RUN npm install --legacy-peer-deps
+COPY backend/ ./
+RUN npm run build
+
+# ---- Production ----
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /build/dist ./dist
+COPY --from=build /build/node_modules ./node_modules
+COPY --from=build /build/package.json ./
+
+CMD ["node", "dist/main"]

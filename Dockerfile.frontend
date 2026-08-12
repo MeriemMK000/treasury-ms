@@ -1,0 +1,15 @@
+# ---- Build ----
+FROM node:20-alpine AS build
+WORKDIR /build
+COPY frontend/package*.json ./
+RUN npm install --legacy-peer-deps
+COPY frontend/ ./
+RUN npm run build
+
+# ---- Production ----
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=build /build/.next/standalone ./
+COPY --from=build /build/.next/static ./.next/static
+
+CMD ["node", "server.js"]
