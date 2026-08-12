@@ -4,6 +4,7 @@ WORKDIR /build
 COPY frontend/package*.json ./
 RUN npm install --legacy-peer-deps
 COPY frontend/ ./
+ENV NEXT_PUBLIC_API_URL=https://treasury-ms-api.onrender.com
 RUN npm run build
 
 # ---- Production ----
@@ -12,4 +13,7 @@ WORKDIR /app
 COPY --from=build /build/.next/standalone ./
 COPY --from=build /build/.next/static ./.next/static
 
-CMD ["node", "server.js"]
+# Render injects HOSTNAME=<pod-name> into the container; Next.js's
+# standalone server binds to that instead of the wildcard address if
+# set, so the platform's proxy can't reach it. Force it back to 0.0.0.0.
+CMD ["sh", "-c", "HOSTNAME=0.0.0.0 node server.js"]
