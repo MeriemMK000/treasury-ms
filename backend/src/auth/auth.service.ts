@@ -1,16 +1,20 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User } from '../users/entities/user.entity';
+import { Group } from '../groups/entities/group.entity';
+import { UserRole } from '../common/enums';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { BootstrapDto } from './dto/bootstrap.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(Group) private groupRepo: Repository<Group>,
     private jwtService: JwtService,
   ) {}
 
@@ -48,6 +52,29 @@ export class AuthService {
         businessUnitIds: user.businessUnitIds,
       },
     };
+  }
+
+  async bootstrap(dto: BootstrapDto) {
+    const anyUser = await this.userRepo.findOne({ where: {} });
+    if (anyUser) throw new ForbiddenException('Un utilisateur existe déjà, le bootstrap est désactivé');
+
+    const group = this.groupRepo.create({ name: 'Groupe Principal' });
+    const savedGroup = await this.groupRepo.save(group);
+
+    const hashed = await bcrypt.hash(dto.password, 12);
+    const user = this.userRepo.create({
+      email: dto.email,
+      password: hashed,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      role: UserRole.SUPER_ADMIN,
+      groupId: savedGroup.id,
+      businessUnitIds: [],
+    });
+    const saved = await this.userRepo.save(user);
+
+    const { password, ...result } = saved;
+    return result;
   }
 
   async register(dto: RegisterDto) {

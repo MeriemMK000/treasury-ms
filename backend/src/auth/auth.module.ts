@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { User } from '../users/entities/user.entity';
+import { Group } from '../groups/entities/group.entity';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { User } from '../users/entities/user.entity';
       secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key',
       signOptions: { expiresIn: process.env.JWT_EXPIRATION || '8h' },
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Group]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
