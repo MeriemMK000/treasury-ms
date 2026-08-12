@@ -1,0 +1,31 @@
+# ---- Build Backend ----
+FROM node:20-alpine AS backend-build
+WORKDIR /build
+COPY backend/package*.json ./
+RUN npm install
+COPY backend/ ./
+RUN npm run build
+
+# ---- Build Frontend ----
+FROM node:20-alpine AS frontend-build
+WORKDIR /build
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ ./
+ENV NEXT_PUBLIC_API_URL=http://localhost:3001
+RUN npm run build
+
+# ---- Production ----
+FROM node:20-alpine
+WORKDIR /app
+
+COPY --from=backend-build /build/dist ./backend/dist
+COPY --from=backend-build /build/node_modules ./backend/node_modules
+COPY --from=backend-build /build/package.json ./backend/
+
+COPY --from=frontend-build /build/.next/standalone ./frontend
+COPY --from=frontend-build /build/.next/static ./frontend/.next/static
+
+EXPOSE 3000
+
+CMD sh -c "cd /app/backend && node dist/config/seed.js 2>/dev/null; PORT=3001 node dist/main & cd /app/frontend && PORT=\${PORT:-3000} node server.js"
