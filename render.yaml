@@ -1,0 +1,41 @@
+databases:
+  - name: treasury-db
+    plan: free
+    databaseName: treasury_ms
+    user: treasury
+
+services:
+  - type: web
+    name: treasury-ms
+    plan: free
+    env: docker
+    dockerfilePath: ./Dockerfile.render
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: treasury-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: treasury-db
+          property: port
+      - key: DB_USERNAME
+        fromDatabase:
+          name: treasury-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: treasury-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: treasury-db
+          property: database
+      - key: DB_SSL
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: "8h"
+      - key: NODE_ENV
+        value: "development"
