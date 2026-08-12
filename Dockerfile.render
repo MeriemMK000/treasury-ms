@@ -28,4 +28,4 @@ COPY --from=frontend-build /build/.next/static ./frontend/.next/static
 
 EXPOSE 3000
 
-CMD sh -c "cd /app/backend && node dist/config/seed.js 2>/dev/null; PORT=3001 node dist/main & cd /app/frontend && PORT=\${PORT:-3000} node server.js"
+CMD sh -c "cd /app/backend && PORT=3001 node dist/main & cd /app/frontend && PORT=\${PORT:-3000} node server.js"

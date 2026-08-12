@@ -11,4 +11,7 @@ export const databaseConfig = (): TypeOrmModuleOptions => ({
   synchronize: process.env.DB_SYNCHRONIZE !== 'false',
   logging: process.env.NODE_ENV === 'development',
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  connectTimeoutMS: 10000,
+  retryAttempts: 10,
+  retryDelay: 3000,
 });
